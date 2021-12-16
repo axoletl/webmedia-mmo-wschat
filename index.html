@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    message test
+    <pre id="messages" style="height: 200px; overflow:scroll"></pre>
+    <input id="messageBox" type="text" placeholder="message here"
+        style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
+    <button id="send" title="send message" style='width: 100%; height: 30px;'>send message</button>
+</body>
+
+<script>
+    const sendBtn = document.getElementById('send');
+    const messages = document.getElementById('messages');
+    const messageBox = document.getElementById('messageBox');
+
+    //import websocket
+    let ws;
+    let user = 'user' + rndNum(0, 498289);
+    let avatar = [rndNum(1, 4), rndNum(1, 4), rndNum(1, 4)];
+
+    function rndNum(min, max) {
+        return Math.floor(Math.random() * (max - min) + min);
+    }
+
+    init();
+    function init() {
+        if (ws) {
+            ws.onerror = ws.onopen = ws.onclose = null;
+            ws.close();
+        }
+
+        //initialise websocket
+        ws = new WebSocket('ws://webmedia-mmo-ws.herokuapp.com/');
+        //ws success event
+        ws.onopen = () => {
+            console.log('connection open');
+        }
+        //ws receiving event
+        ws.onmessage = ({ data }) => showMessage(data);
+        //ws close event
+        ws.onclose = function () {
+            ws = null;
+        }
+    }
+
+    //message parse
+    function showMessage(message) {
+        // console.log(message);
+        let textData;
+        if (message instanceof Blob) {
+            message.text().then((resp) => {
+                // let data = JSON.parse(resp);
+                textData = resp;
+                data = JSON.parse(textData);
+                console.log(data);
+                messages.textContent += '\n\n' + data.user + ": " + data.message;
+                messages.scrollTop = messages.scrollHeight;
+            });
+        } else {
+            textData = message;
+            data = JSON.parse(textData);
+            console.log(data);
+            messages.textContent += '\n\n' + data.user + ": " + data.message;
+            messages.scrollTop = messages.scrollHeight;
+        }
+    }
+
+    //message send
+    sendBtn.onclick = function () {
+        //error handle
+        if (!ws) {
+            showMessage("No WebSocket connection");
+            return;
+        }
+
+        let data = {
+            "user": user,
+            "location": location.href,
+            "avatar": avatar,
+            "message": messageBox.value
+        }
+
+        ws.send(JSON.stringify(data));
+        showMessage(JSON.stringify(data));
+        messageBox.value = '';
+    }
+</script>
+
+</html>
