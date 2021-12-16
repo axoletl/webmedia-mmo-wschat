@@ -1,0 +1,21 @@
+{
+  "name": "mmo-ws-chat",
+  "version": "1.0.0",
+  "description": "Websocket chat implementation by Wil 'Iris' Li",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "node",
+    "js",
+    "websocket"
+  ],
+  "author": "Wil 'Iris' Li",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^8.3.0"
+  }
+}
